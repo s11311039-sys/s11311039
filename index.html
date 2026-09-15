@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>經典貪食蛇 (Retro Snake Game)</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- 頂部計分板 -->
+        <div class="header">
+            <div class="score-box">
+                <span class="label">Current Score</span>
+                <span id="score" class="score-value">0</span>
+            </div>
+            <div class="score-box right">
+                <span class="label">Best Score</span>
+                <span id="highScore" class="score-value high-score">0</span>
+            </div>
+        </div>
+
+        <!-- 遊戲 Canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- 提示訊息 -->
+        <div class="footer-hints">
+            <span>移動：<span class="key">WASD</span> / <span class="key">↑ ↓ ← →</span></span>
+            <span>開始/重試：<span class="key">SPACE</span></span>
+        </div>
+    </div>
+
+    <!-- ES6 模組進入點 -->
+    <script type="module" src="./js/main.js"></script>
+</body>
+</html>
