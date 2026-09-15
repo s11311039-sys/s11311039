@@ -2,6 +2,7 @@
 chcp 65001 >nul
 title GitHub 專案一鍵推送工具 (retro-game-project)
 cd /d "%~dp0"
+set "PATH=C:\Program Files\Git\cmd;C:\Program Files\Git\bin;C:\Program Files\Git\mingw64\bin;%PATH%"
 
 echo =======================================================
 echo   正在推送復古貪食蛇專案到 GitHub...
@@ -10,7 +11,7 @@ echo   目標儲存庫：retro-game-project
 echo =======================================================
 echo.
 
-git push -u origin main
+"C:\Program Files\Git\cmd\git.exe" push -u origin main
 
 echo.
 if %ERRORLEVEL% EQU 0 (
@@ -25,9 +26,7 @@ if %ERRORLEVEL% EQU 0 (
     echo =======================================================
 ) else (
     echo =======================================================
-    echo  [提示] 推送需要 GitHub 授權。
-    echo  若剛才有彈出瀏覽器登入視窗，請點擊 Authorize 完成授權。
-    echo  授權完成後，請重新執行本工具即可成功推送。
+    echo  [提示] 若有跳出 GitHub 網頁授權視窗，請點擊 Authorize 完成授權。
     echo =======================================================
 )
 
