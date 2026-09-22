@@ -2,7 +2,7 @@
 
 > 具備現代 ES6 模組化遊戲引擎架構的 HTML5 經典貪食蛇。
 
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-brightgreen?logo=github)](https://s11311039-sys.github.io/retro-game-project/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-brightgreen?logo=github)](https://s11311039-sys.github.io/s11311039/)
 [![JavaScript](https://img.shields.io/badge/ES6-Modules-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/zh-TW/docs/Web/JavaScript/Guide/Modules)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -10,7 +10,7 @@
 
 ## 🎮 線上直接遊玩 (Live Demo)
 
-點擊直接遊玩：👉 **[https://s11311039-sys.github.io/retro-game-project/](https://s11311039-sys.github.io/retro-game-project/)**
+點擊直接遊玩：👉 **[https://s11311039-sys.github.io/s11311039/](https://s11311039-sys.github.io/s11311039/)**
 
 ---
 
