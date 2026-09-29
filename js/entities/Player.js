@@ -75,33 +75,134 @@ export class Player extends Entity {
     }
 
     /**
-     * 繪製蛇頭、眼睛與蛇身
+     * 繪製蛇頭、眼睛、動態吐舌與霓虹漸層蛇身
      * @param {CanvasRenderingContext2D} ctx
      */
     draw(ctx) {
         const tileSize = GRID_CONFIG.TILE_SIZE;
+        const total = this.segments.length;
 
-        this.segments.forEach((segment, index) => {
+        // 1. 先反向繪製蛇身（從尾部到身體），確保蛇頭覆蓋在最上層
+        for (let index = total - 1; index >= 1; index--) {
+            const segment = this.segments[index];
             const px = segment.x * tileSize;
             const py = segment.y * tileSize;
 
-            if (index === 0) {
-                // 蛇頭：霓虹光暈與圓角
-                ctx.fillStyle = STYLE_CONFIG.COLORS.SNAKE_HEAD;
-                ctx.shadowBlur = STYLE_CONFIG.GLOW.HEAD_BLUR;
-                ctx.shadowColor = STYLE_CONFIG.COLORS.SNAKE_HEAD_GLOW;
-                this._drawRoundRect(ctx, px + 1, py + 1, tileSize - 2, tileSize - 2, 5);
-                ctx.shadowBlur = 0; // 重置光暈
-
-                // 蛇頭眼睛 (依面向旋轉)
-                this._drawEyes(ctx, px, py, this.currentDir);
+            // 計算從青藍 -> 寶藍 -> 霓虹紫的漸層顏色
+            const t = index / Math.max(1, total - 1);
+            let color;
+            if (t < 0.5) {
+                color = this._interpolateColor(
+                    STYLE_CONFIG.COLORS.SNAKE_BODY_START,
+                    STYLE_CONFIG.COLORS.SNAKE_BODY_MID,
+                    t * 2
+                );
             } else {
-                // 蛇身：透明度漸變與圓角
-                const opacity = Math.max(0.3, 1 - (index / this.segments.length) * 0.6);
-                ctx.fillStyle = `rgba(16, 185, 129, ${opacity})`;
-                this._drawRoundRect(ctx, px + 1, py + 1, tileSize - 2, tileSize - 2, 3);
+                color = this._interpolateColor(
+                    STYLE_CONFIG.COLORS.SNAKE_BODY_MID,
+                    STYLE_CONFIG.COLORS.SNAKE_BODY_END,
+                    (t - 0.5) * 2
+                );
             }
-        });
+
+            // 節點本體 (微縮放營造圓潤流線感)
+            const margin = Math.min(2.5, 1 + index * 0.1);
+            const size = tileSize - margin * 2;
+            const radius = Math.max(4, 7 - index * 0.15);
+
+            ctx.fillStyle = color;
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = color;
+            this._drawRoundRect(ctx, px + margin, py + margin, size, size, radius);
+            ctx.shadowBlur = 0;
+
+            // 蛇身節點上方高光（立體感）
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+            ctx.beginPath();
+            ctx.arc(px + margin + size * 0.35, py + margin + size * 0.35, size * 0.18, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 2. 繪製蛇頭 (index === 0)
+        const head = this.segments[0];
+        const hx = head.x * tileSize;
+        const hy = head.y * tileSize;
+
+        // 動態蛇信 (吐舌動畫)
+        this._drawTongue(ctx, hx, hy, this.currentDir);
+
+        // 蛇頭本體與霓虹外光暈
+        ctx.fillStyle = STYLE_CONFIG.COLORS.SNAKE_HEAD;
+        ctx.shadowBlur = STYLE_CONFIG.GLOW.HEAD_BLUR;
+        ctx.shadowColor = STYLE_CONFIG.COLORS.SNAKE_HEAD_GLOW;
+        this._drawRoundRect(ctx, hx + 1, hy + 1, tileSize - 2, tileSize - 2, 6);
+        ctx.shadowBlur = 0;
+
+        // 蛇頭高光
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.beginPath();
+        ctx.arc(hx + tileSize * 0.35, hy + tileSize * 0.35, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 靈動雙眼 (眼白 + 黑眼球 + 轉向注視)
+        this._drawEyes(ctx, hx, hy, this.currentDir);
+    }
+
+    /**
+     * 雙色 RGB 線性插值輔助
+     * @private
+     */
+    _interpolateColor(color1, color2, factor) {
+        const c1 = parseInt(color1.slice(1), 16);
+        const c2 = parseInt(color2.slice(1), 16);
+        const r1 = (c1 >> 16) & 255, g1 = (c1 >> 8) & 255, b1 = c1 & 255;
+        const r2 = (c2 >> 16) & 255, g2 = (c2 >> 8) & 255, b2 = c2 & 255;
+        const r = Math.round(r1 + factor * (r2 - r1));
+        const g = Math.round(g1 + factor * (g2 - g1));
+        const b = Math.round(b1 + factor * (b2 - b1));
+        return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    /**
+     * 動態吐舌動畫 (蛇信)
+     * @private
+     */
+    _drawTongue(ctx, x, y, dir) {
+        // 週期性吐出舌頭 (呼吸頻率)
+        const isFlicking = Math.sin(Date.now() / 140) > 0.3;
+        if (!isFlicking) return;
+
+        const ts = GRID_CONFIG.TILE_SIZE;
+        const tongueLen = 6;
+        let startX = x + ts / 2;
+        let startY = y + ts / 2;
+        let endX = startX + dir.x * (ts / 2 + tongueLen);
+        let endY = startY + dir.y * (ts / 2 + tongueLen);
+
+        ctx.strokeStyle = STYLE_CONFIG.COLORS.SNAKE_TONGUE;
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+
+        // 舌幹
+        ctx.beginPath();
+        ctx.moveTo(startX + dir.x * (ts / 2), startY + dir.y * (ts / 2));
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+
+        // 舌尖分叉 (小 V 字)
+        ctx.beginPath();
+        if (dir.x !== 0) {
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(endX + dir.x * 2, endY - 2);
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(endX + dir.x * 2, endY + 2);
+        } else {
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(endX - 2, endY + dir.y * 2);
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(endX + 2, endY + dir.y * 2);
+        }
+        ctx.stroke();
     }
 
     /**
@@ -115,29 +216,42 @@ export class Player extends Entity {
     }
 
     /**
-     * 蛇頭雙眼繪製輔助
+     * 靈動雙眼繪製 (具有眼白、瞳孔與高光注視)
      * @private
      */
     _drawEyes(ctx, x, y, dir) {
-        ctx.fillStyle = STYLE_CONFIG.COLORS.EYES;
-        let eye1X, eye1Y, eye2X, eye2Y;
-        const eyeSize = 2;
+        let e1x, e1y, e2x, e2y;
+        const ts = GRID_CONFIG.TILE_SIZE;
 
         if (dir.x === 1) { // 向右
-            eye1X = eye2X = x + 14;
-            eye1Y = y + 5; eye2Y = y + 13;
+            e1x = x + ts - 6; e1y = y + 5;
+            e2x = x + ts - 6; e2y = y + ts - 5;
         } else if (dir.x === -1) { // 向左
-            eye1X = eye2X = x + 4;
-            eye1Y = y + 5; eye2Y = y + 13;
+            e1x = x + 6; e1y = y + 5;
+            e2x = x + 6; e2y = y + ts - 5;
         } else if (dir.y === -1) { // 向上
-            eye1Y = eye2Y = y + 4;
-            eye1X = x + 5; eye2X = x + 13;
+            e1x = x + 5; e1y = y + 6;
+            e2x = x + ts - 5; e2y = y + 6;
         } else { // 向下
-            eye1Y = eye2Y = y + 14;
-            eye1X = x + 5; eye2X = x + 13;
+            e1x = x + 5; e1y = y + ts - 6;
+            e2x = x + ts - 5; e2y = y + ts - 6;
         }
 
-        ctx.fillRect(eye1X, eye1Y, eyeSize, eyeSize);
-        ctx.fillRect(eye2X, eye2Y, eyeSize, eyeSize);
+        const eyeRadius = 3;
+        const pupilRadius = 1.5;
+
+        // 眼白
+        ctx.fillStyle = STYLE_CONFIG.COLORS.EYE_SCLERA;
+        ctx.beginPath();
+        ctx.arc(e1x, e1y, eyeRadius, 0, Math.PI * 2);
+        ctx.arc(e2x, e2y, eyeRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 黑瞳孔 (往移動方向偏移 1px 注視)
+        ctx.fillStyle = STYLE_CONFIG.COLORS.EYE_PUPIL;
+        ctx.beginPath();
+        ctx.arc(e1x + dir.x * 1, e1y + dir.y * 1, pupilRadius, 0, Math.PI * 2);
+        ctx.arc(e2x + dir.x * 1, e2y + dir.y * 1, pupilRadius, 0, Math.PI * 2);
+        ctx.fill();
     }
 }

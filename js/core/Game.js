@@ -9,6 +9,7 @@ import { Player } from '../entities/Player.js';
 import { Food } from '../entities/Food.js';
 import { Physics } from '../systems/Physics.js';
 import { ParticleSystem } from '../systems/ParticleSystem.js';
+import { SoundSystem } from '../systems/SoundSystem.js';
 import { HUD } from '../ui/HUD.js';
 import { GameLoop } from './GameLoop.js';
 import { InputHandler } from './InputHandler.js';
@@ -42,6 +43,7 @@ export class Game {
         this.player = new Player();
         this.food = new Food();
         this.particleSystem = new ParticleSystem();
+        this.soundSystem = new SoundSystem();
         this.hud = new HUD(scoreEl, highScoreEl, this.canvas);
 
         // 輸入監聽初始化
@@ -88,13 +90,23 @@ export class Game {
      */
     handleDirection(dir) {
         if (!this.gameStarted || this.gameOver) return;
+        this.soundSystem.initContext();
+
+        const prevX = this.player.nextDir.x;
+        const prevY = this.player.nextDir.y;
         this.player.setDirection(dir);
+
+        // 若轉向被成功接受，播放微音量轉彎反饋音
+        if (this.player.nextDir.x !== prevX || this.player.nextDir.y !== prevY) {
+            this.soundSystem.playTurn();
+        }
     }
 
     /**
      * 處理空白鍵或點擊動作
      */
     handleAction() {
+        this.soundSystem.initContext();
         if (!this.gameStarted || this.gameOver) {
             this.startNewGame();
         }
@@ -105,6 +117,7 @@ export class Game {
      */
     triggerGameOver() {
         this.gameOver = true;
+        this.soundSystem.playDie();
     }
 
     /**
@@ -135,6 +148,7 @@ export class Game {
         if (isEating) {
             this.player.move(nextHead, true);
             this.score += GAMEPLAY_CONFIG.SCORE_PER_FOOD;
+            this.soundSystem.playEat();
 
             // 最高分記錄更新
             if (this.score > this.highScore) {

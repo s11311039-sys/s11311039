@@ -25,20 +25,34 @@ export class Food extends Entity {
     }
 
     /**
-     * 繪製霓虹食物
+     * 繪製霓虹蘋果食物（帶有小綠葉與晶瑩高光）
      * @param {CanvasRenderingContext2D} ctx
      */
     draw(ctx) {
         const tileSize = GRID_CONFIG.TILE_SIZE;
         const foodX = this.x * tileSize + tileSize / 2;
-        const foodY = this.y * tileSize + tileSize / 2;
+        const foodY = this.y * tileSize + tileSize / 2 + 1;
+        const radius = tileSize / 2 - 3;
 
+        // 蘋果葉柄 / 小綠葉
+        ctx.fillStyle = '#00f5d4';
+        ctx.beginPath();
+        ctx.ellipse(foodX + 2, foodY - radius - 1, 3, 1.5, Math.PI / 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 霓虹蘋果本體與發光
         ctx.shadowBlur = STYLE_CONFIG.GLOW.FOOD_BLUR;
         ctx.shadowColor = STYLE_CONFIG.COLORS.FOOD_GLOW;
         ctx.fillStyle = STYLE_CONFIG.COLORS.FOOD;
         ctx.beginPath();
-        ctx.arc(foodX, foodY, tileSize / 2 - 2, 0, Math.PI * 2);
+        ctx.arc(foodX, foodY, radius, 0, Math.PI * 2);
         ctx.fill();
         ctx.shadowBlur = 0; // 重置陰影模糊
+
+        // 晶瑩反光高光
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.beginPath();
+        ctx.arc(foodX - radius * 0.35, foodY - radius * 0.35, 1.8, 0, Math.PI * 2);
+        ctx.fill();
     }
 }

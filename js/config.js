@@ -40,20 +40,27 @@ export const PARTICLE_CONFIG = {
 
 export const STYLE_CONFIG = {
     COLORS: {
-        CANVAS_BG: '#020617',
-        GRID_LINE: '#0f172a',
-        SNAKE_HEAD: '#10b981',
-        SNAKE_HEAD_GLOW: '#10b981',
-        FOOD: '#ef4444',
-        FOOD_GLOW: '#ef4444',
-        EYES: '#ffffff',
-        OVERLAY_BG: 'rgba(2, 6, 23, 0.85)',
-        OVERLAY_TITLE: '#f8fafc',
+        CANVAS_BG: '#050814',
+        CANVAS_BG_CENTER: '#0e172c',
+        GRID_LINE: 'rgba(30, 45, 75, 0.4)',
+        GRID_DOT: 'rgba(56, 189, 248, 0.3)',
+        SNAKE_HEAD: '#00f5d4',
+        SNAKE_HEAD_GLOW: '#00f5d4',
+        SNAKE_BODY_START: '#00bbf9',
+        SNAKE_BODY_MID: '#4361ee',
+        SNAKE_BODY_END: '#7209b7',
+        SNAKE_TONGUE: '#ff0054',
+        EYE_SCLERA: '#ffffff',
+        EYE_PUPIL: '#090d16',
+        FOOD: '#ff0054',
+        FOOD_GLOW: '#ff0054',
+        OVERLAY_BG: 'rgba(5, 8, 20, 0.88)',
+        OVERLAY_TITLE: '#00f5d4',
         OVERLAY_SUBTITLE: '#94a3b8'
     },
     GLOW: {
-        HEAD_BLUR: 8,
-        FOOD_BLUR: 10
+        HEAD_BLUR: 12,
+        FOOD_BLUR: 14
     }
 };
 
