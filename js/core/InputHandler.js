@@ -9,10 +9,12 @@ export class InputHandler {
      * @param {Object} callbacks
      * @param {Function} callbacks.onDirection
      * @param {Function} callbacks.onAction
+     * @param {Function} callbacks.onToggleBGM
      */
-    constructor({ onDirection, onAction }) {
+    constructor({ onDirection, onAction, onToggleBGM }) {
         this.onDirection = onDirection;
         this.onAction = onAction;
+        this.onToggleBGM = onToggleBGM;
 
         this._handleKeyDown = this._handleKeyDown.bind(this);
         this._handlePointerDown = this._handlePointerDown.bind(this);
@@ -48,6 +50,12 @@ export class InputHandler {
 
         if (preventKeys.includes(key)) {
             e.preventDefault();
+        }
+
+        // M 鍵 (切換背景音樂)
+        if (key === 'm') {
+            if (this.onToggleBGM) this.onToggleBGM();
+            return;
         }
 
         // 空白鍵動作 (開始/重試)

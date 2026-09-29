@@ -8,6 +8,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('gameCanvas');
     const scoreEl = document.getElementById('score');
     const highScoreEl = document.getElementById('highScore');
+    const bgmToggleEl = document.getElementById('bgmToggle');
 
     if (!canvas) {
         console.error('找不到遊戲 Canvas 元件 (#gameCanvas)');
@@ -18,7 +19,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const game = new Game({
         canvas,
         scoreEl,
-        highScoreEl
+        highScoreEl,
+        bgmToggleEl
     });
 
     // 啟動引擎

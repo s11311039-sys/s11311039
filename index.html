@@ -8,12 +8,13 @@
 </head>
 <body>
     <div class="game-container">
-        <!-- 頂部計分板 -->
+        <!-- 頂部計分板與音樂按鈕 -->
         <div class="header">
             <div class="score-box">
                 <span class="label">Current Score</span>
                 <span id="score" class="score-value">0</span>
             </div>
+            <button id="bgmToggle" class="bgm-toggle-btn" title="切換背景音樂 (快捷鍵: M)">🔊 BGM: ON</button>
             <div class="score-box right">
                 <span class="label">Best Score</span>
                 <span id="highScore" class="score-value high-score">0</span>
@@ -27,6 +28,7 @@
         <div class="footer-hints">
             <span>移動：<span class="key">WASD</span> / <span class="key">↑ ↓ ← →</span></span>
             <span>開始/重試：<span class="key">SPACE</span></span>
+            <span>音樂：<span class="key">M</span></span>
         </div>
     </div>
 

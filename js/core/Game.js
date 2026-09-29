@@ -24,8 +24,9 @@ export class Game {
      * @param {HTMLCanvasElement} elements.canvas
      * @param {HTMLElement} elements.scoreEl
      * @param {HTMLElement} elements.highScoreEl
+     * @param {HTMLElement} [elements.bgmToggleEl]
      */
-    constructor({ canvas, scoreEl, highScoreEl }) {
+    constructor({ canvas, scoreEl, highScoreEl, bgmToggleEl }) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
 
@@ -46,10 +47,17 @@ export class Game {
         this.soundSystem = new SoundSystem();
         this.hud = new HUD(scoreEl, highScoreEl, this.canvas);
 
-        // 輸入監聽初始化
+        // 背景音樂開關按鈕掛載
+        this.bgmToggleEl = bgmToggleEl || document.getElementById('bgmToggle');
+        if (this.bgmToggleEl) {
+            this.bgmToggleEl.addEventListener('click', () => this.toggleBGM());
+        }
+
+        // 輸入監聽初始化 (包含 M 鍵切換音樂)
         this.inputHandler = new InputHandler({
             onDirection: (dir) => this.handleDirection(dir),
-            onAction: () => this.handleAction()
+            onAction: () => this.handleAction(),
+            onToggleBGM: () => this.toggleBGM()
         });
 
         // 遊戲循環初始化 (以 fixed tick rate 驅動邏輯更新)
@@ -61,6 +69,30 @@ export class Game {
 
         // 同步初始分數至介面
         this.hud.updateScore(this.score, this.highScore);
+    }
+
+    /**
+     * 切換背景音樂
+     */
+    toggleBGM() {
+        this.soundSystem.initContext();
+        const enabled = this.soundSystem.toggleBGM();
+        this.updateBGMButton(enabled);
+    }
+
+    /**
+     * 更新背景音樂按鈕介面樣式
+     * @param {boolean} enabled
+     */
+    updateBGMButton(enabled) {
+        if (!this.bgmToggleEl) return;
+        if (enabled) {
+            this.bgmToggleEl.textContent = '🔊 BGM: ON';
+            this.bgmToggleEl.classList.remove('muted');
+        } else {
+            this.bgmToggleEl.textContent = '🔇 BGM: OFF';
+            this.bgmToggleEl.classList.add('muted');
+        }
     }
 
     /**
@@ -82,6 +114,9 @@ export class Game {
 
         this.food.spawn(this.player.segments);
         this.hud.updateScore(this.score, this.highScore);
+
+        // 啟動背景音樂
+        this.soundSystem.startBGM();
     }
 
     /**
@@ -118,6 +153,7 @@ export class Game {
     triggerGameOver() {
         this.gameOver = true;
         this.soundSystem.playDie();
+        this.soundSystem.stopBGM();
     }
 
     /**
